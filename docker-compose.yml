@@ -1,0 +1,34 @@
+version: '3.8'
+services:
+  ruby:
+    build:
+      context: .
+      dockerfile: Dockerfile.ruby
+    volumes:
+      - .:/app
+  backend:
+    build:
+      context: .
+      args:
+        APP_ENV: development
+    volumes:
+      - .:/rails
+    ports:
+      - 3000:3000
+    env_file:
+      - .env
+    depends_on:
+      - db
+    command: bash -c "bundle exec rails s -b '0.0.0.0'"
+  db:
+    image: mysql:8.0.36
+    platform: linux/amd64
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - db-data:/var/lib/mysql
+    ports:
+      - 33060:3306
+
+volumes:
+  db-data:
